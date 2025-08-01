@@ -1,0 +1,100 @@
+# Sistema base
+base
+base-devel
+linux
+linux-firmware
+linux-firmware-marvell
+linux-headers
+logrotate
+lsb-release
+mkinitcpio
+networkmanager
+sudo
+iptables-nft
+
+
+cryptsetup
+device-mapper
+diffutils
+edk2-shell
+inetutils
+less
+
+
+# Terminal i entorns gràfics
+kitty
+zsh
+neovim
+git
+htop
+wget
+curl
+man-db
+bash-completion
+
+# Desenvolupament
+neovim
+code
+nvm
+nodejs-lts
+npm
+python
+go
+rust
+docker
+docker-compose
+dosfstools
+
+# X11 + i3
+xorg
+xorg-xinit
+i3-wm
+i3status
+dmenu
+feh
+picom
+lxappearance
+
+# Xarxa al live
+dhclient
+
+
+
+# Boot 
+efibootmgr
+efitools
+
+
+# ISO Live specific
+arch-install-scripts
+memtest86+
+memtest86+-efi
+mkinitcpio-archiso
+mkinitcpio-nfs-utils
+pv
+syslinux
+
+## Live iso tools
+clonezilla
+efitools
+fsarchiver
+gpart
+gparted
+grsync
+partitionmanager
+hdparm
+
+## Fonts
+cantarell-fonts
+noto-fonts
+noto-fonts-emoji
+noto-fonts-cjk
+noto-fonts-extra
+ttf-bitstream-vera
+ttf-dejavu
+ttf-liberation
+ttf-opensans
+
+## CPU
+amd-ucode
+intel-ucode

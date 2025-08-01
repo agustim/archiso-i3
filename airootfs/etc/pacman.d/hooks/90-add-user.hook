@@ -1,0 +1,11 @@
+# remove from airootfs!
+
+[Trigger]
+Operation = Install
+Type = Path
+Target = usr/bin/useradd
+
+[Action]
+Description = Adding user agusti
+When = PostTransaction
+Exec = /usr/local/bin/add-user-agusti.sh
