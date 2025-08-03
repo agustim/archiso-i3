@@ -48,8 +48,12 @@ dosfstools
 # X11 + i3
 xorg
 xorg-xinit
+xorg-apps
+xterm
+dbus
 i3-wm
 i3status
+i3lock
 dmenu
 feh
 picom
@@ -57,8 +61,9 @@ lxappearance
 
 # Xarxa al live
 dhclient
-
-
+nmcli
+nmtui
+network-manager-applet
 
 # Boot 
 efibootmgr
@@ -98,3 +103,11 @@ ttf-opensans
 ## CPU
 amd-ucode
 intel-ucode
+
+## Browsers
+firefox
+chromium
+nyxt
+
+## IM Clients
+telegra-desktop
