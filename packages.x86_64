@@ -61,8 +61,6 @@ lxappearance
 
 # Xarxa al live
 dhclient
-nmcli
-nmtui
 network-manager-applet
 
 # Boot 
@@ -110,4 +108,14 @@ chromium
 nyxt
 
 ## IM Clients
-telegra-desktop
+telegram-desktop
+
+
+## Video i audio
+mpv
+vlc
+yt-dlp
+fzf
+ytfzf
+feeluown-ytmusic
+thunar

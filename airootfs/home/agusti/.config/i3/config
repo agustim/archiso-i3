@@ -7,6 +7,17 @@ font pango:DejaVu Sans Mono 10
 # Inicia un terminal
 bindsym $mod+Return exec kitty
 
+# Inicia un navegador web
+bindsym $mod+f exec firefox
+
+# Inicia un editor de codi
+bindsym $mod+c exec code
+
+# Inicia un gestor de fitxers
+bindsym $mod+e exec thunar
+
+# Inicia un reproductor de música
+
 # Llença el menú d'aplicacions
 bindsym $mod+d exec dmenu_run
 
