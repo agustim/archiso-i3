@@ -20,20 +20,21 @@ Crear una ISO autoexecutant que inclogui:
 ```
 archiso-i3/
 ├── airootfs/                         # Arrel del sistema live
+├── efiboot/                          # Arranc en efiboot
+├── syslinux/                         # Arranc en syslinux
 ├── build.sh                          # Script per generar la ISO
 ├── generate-aur-packages.sh          # Compila AUR i crea el repo local
 ├── packages.x86_64                   # Paquets a instal·lar amb pacman
 ├── packages.x86_64.aur               # Llista de paquets AUR
 ├── pacman.conf                       # Configuració de pacman per la ISO
-├── profiledef.sh                     # Perfil d’archiso (label, modes, etc.)
-└── scripts/                          # Opcional: scripts helpers (si existeixen)
+└── profiledef.sh                     # Perfil d’archiso (label, modes, etc.)
 ```
 
 ---
 
 ## ⚙️ Com funciona
 
-1. `build.sh` és l’script principal:
+`build.sh` és l’script principal:
    - Netega directoris (`workdir`, `out`, el repo)
    - Fes backup de `packages.x86_64` i `pacman.conf`
    - Executa `generate-aur-packages.sh`
@@ -42,7 +43,6 @@ archiso-i3/
    - Genera la ISO amb `mkarchiso`
    - Restaura els fitxers originals de configuració
 
-2. `generate-aur-packages.sh` clona cada paquet de la llista `.aur`, el compila amb `makepkg` i crea un `.zst`; després genera un repo local amb `repo-add`.
 
 ---
 
