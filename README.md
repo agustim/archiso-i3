@@ -64,7 +64,7 @@ sudo pacman -Syu archiso base-devel git squashfs-tools
 Des del directori del projecte:
 
 ```bash
-chmod +x build.sh generate-aur-packages.sh
+chmod +x build.sh
 sudo ./build.sh
 ```
 
@@ -80,7 +80,7 @@ L’arxiu ISO es generarà a `out/arch-i3--x86_64.iso`.
 qemu-system-x86_64 -cdrom out/arch-i3--x86_64.iso -m 2G -enable-kvm
 ```
 
-L'usuari live és `root`, o l’autologin s'activa si està configurat.
+L'usuari live és `agusti`, o l’autologin s'activa si està configurat.
 
 ---
 
