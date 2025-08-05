@@ -1,72 +1,71 @@
 #!/bin/bash
+set -euo pipefail
 
-set -e # Exit on error
+# === FUNCIONS ===
 
-# Directori d'aquest script
-SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+cleanup() {
+  echo "🔁 Restaurant fitxers de backup..."
+  [[ -f "$SCRIPT_DIR/packages.x86_64.backup" ]] && mv "$SCRIPT_DIR/packages.x86_64.backup" "$SCRIPT_DIR/packages.x86_64"
+  [[ -f "$SCRIPT_DIR/pacman.conf.backup" ]] && mv "$SCRIPT_DIR/pacman.conf.backup" "$SCRIPT_DIR/pacman.conf"
+}
+trap cleanup EXIT
 
 # === CONFIGURACIÓ ===
-AUR_LIST="${1:-$SCRIPT_DIR/packages.x86_64.aur}"   # Fitxer amb paquets AUR
-BUILD_DIR="${2:-/tmp/aur-build}"         # Directori temporal
-REPO_NAME="${3:-customrepo}"            # Nom del repo
-REPO_DIR="${4:-$SCRIPT_DIR/packages}"             # On generar el repositori final
-WORK_DIR="${5:-$SCRIPT_DIR/workdir}"         # Directori de treball
-OUT_DIR="${6:-$SCRIPT_DIR/out}"           # Directori de sortida
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+
+AUR_LIST="${1:-$SCRIPT_DIR/packages.x86_64.aur}"
+BUILD_DIR="${2:-/tmp/aur-build}"
+REPO_NAME="${3:-customrepo}"
+REPO_DIR="${4:-$SCRIPT_DIR/packages}"
+WORK_DIR="${5:-$SCRIPT_DIR/workdir}"
+OUT_DIR="${6:-$SCRIPT_DIR/out}"
 
 PACMAN_CONF="$SCRIPT_DIR/pacman.conf"
 PACKAGES_FILE="$SCRIPT_DIR/packages.x86_64"
 
-# === VALIDACIÓ D'ENTRADES ===
-if [[ ! -f "$AUR_LIST" ]]; then
-  echo "❌ Fitxer de paquets AUR no trobat: $AUR_LIST"
-  exit 1
-fi
+# === VALIDACIONS ===
+[[ -f "$AUR_LIST" ]] || { echo "❌ Fitxer de paquets AUR no trobat: $AUR_LIST"; exit 1; }
+[[ -f "$PACMAN_CONF" ]] || { echo "❌ Fitxer pacman.conf no trobat a: $PACMAN_CONF"; exit 1; }
+[[ -f "$PACKAGES_FILE" ]] || { echo "❌ Fitxer packages.x86_64 no trobat a: $PACKAGES_FILE"; exit 1; }
 
-if [[ ! -f "$PACMAN_CONF" ]]; then
-  echo "❌ Fitxer pacman.conf no trobat a: $PACMAN_CONF"
-  exit 1
-fi
+# === NETEJA ===
+echo "🧹 Netejant $REPO_DIR, $WORK_DIR i $OUT_DIR..."
+sudo rm -rf "$REPO_DIR" "$WORK_DIR" "$OUT_DIR"
+mkdir -p "$REPO_DIR" "$WORK_DIR"
 
-if [[ ! -f "$PACKAGES_FILE" ]]; then
-  echo "❌ Fitxer packages.x86_64 no trobat a: $PACKAGES_FILE"
-  exit 1
-fi
+# === BACKUPS ===
+cp "$PACKAGES_FILE" "$PACKAGES_FILE.backup"
+cp "$PACMAN_CONF" "$PACMAN_CONF.backup"
 
-echo "🧹 Netejant repositori anterior: $REPO_DIR"
-sudo rm -rf "$REPO_DIR"
-mkdir -p "$REPO_DIR"
+# === COMPILACIÓ DE PAQUETS AUR ===
+echo "📦 Compilant paquets AUR i creant repo..."
+mkdir -p "$BUILD_DIR"
+while read -r pkg; do
+  [[ -z "$pkg" || "$pkg" == \#* ]] && continue
+  echo "➡️  Compilant $pkg..."
+  cd "$BUILD_DIR"
+  rm -rf "$pkg"
+  git clone "https://aur.archlinux.org/${pkg}.git"
+  cd "$pkg"
+  makepkg -s --noconfirm
+  cp *.pkg.tar.zst "$REPO_DIR/"
+done < "$AUR_LIST"
 
-echo "📦 Creant repositori AUR"
-/bin/bash "generate-aur-packages.sh" "$AUR_LIST" "$BUILD_DIR" "$REPO_NAME" "$REPO_DIR"
+cd "$REPO_DIR"
+echo "📚 Generant base de dades del repo..."
+rm -f "${REPO_NAME}".db* "${REPO_NAME}".files*
+repo-add "${REPO_NAME}.db.tar.gz" *.pkg.tar.zst
 
-# Restore always backups, when exists.
-restore_backups() {
-  echo "♻️ Restaurant backups..."
-  [ -f "${PACMAN_CONF}.bakup" ] && echo "Restaurat pacman.conf" && mv -f "${PACMAN_CONF}.bakup" "$PACMAN_CONF"
-  [ -f "${PACKAGES_FILE}.bakup" ] && echo "Restaurat packages.x86_64" && mv -f "${PACKAGES_FILE}.bakup" "$PACKAGES_FILE"
-}
+# Tornar al directori de treball
+cd "$SCRIPT_DIR"
 
-trap restore_backups EXIT
+# === MODIFICACIÓ DE CONFIG ===
+echo -e "\n# Paquets AUR" >> "$PACKAGES_FILE"
+cat "$AUR_LIST" >> "$PACKAGES_FILE"
+sed -i "s|file://\[path-to-your-repo\]|file://$REPO_DIR|g" "$PACMAN_CONF"
 
-# Add packages.x86_64.aur to packages.x86_64
-echo "📜 Afegint paquets AUR a packages.x86_64"
-cp "$SCRIPT_DIR/packages.x86_64" "$SCRIPT_DIR/packages.x86_64.backup"
-echo -e "\n# Paquets AUR generats" >> "$SCRIPT_DIR/packages.x86_64"
-cat "$AUR_LIST" >> "$SCRIPT_DIR/packages.x86_64"
-
-# Afegir repositori local a pacman.conf
-echo "🔧 Afegint repositori local a pacman.conf"
-cp "$SCRIPT_DIR/pacman.conf" "$SCRIPT_DIR/pacman.conf.backup"
-# Replace [path-to-your-repo] with the actual path
-sed -i "s|file://\[path-to-your-repo\]|file://$REPO_DIR|g" "$SCRIPT_DIR/pacman.conf"
-
-
-# Exist workdir and/or out? remove them.
-echo "🗑️ Netejant directoris de treball i sortida"
-sudo rm -rf "$WORK_DIR" "$OUT_DIR"
-
-# Generar iso
-echo "📀 Generant ISO amb mkarchiso"
+# === GENERACIÓ DE LA ISO ===
+echo "📀 Generant ISO..."
 sudo mkarchiso -v .
 
-echo "✅ ISO generada amb èxit!"
+echo "✅ Tot completat correctament!"
