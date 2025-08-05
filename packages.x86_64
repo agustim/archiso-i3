@@ -34,7 +34,6 @@ bash-completion
 
 # Desenvolupament
 neovim
-code
 nvm
 nodejs-lts
 npm
@@ -67,7 +66,6 @@ network-manager-applet
 # Boot 
 efibootmgr
 efitools
-
 
 # ISO Live specific
 arch-install-scripts
@@ -119,7 +117,3 @@ yt-dlp
 fzf
 ytfzf
 thunar
-
-# Paquets AUR generats
-yay
-

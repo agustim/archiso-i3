@@ -26,7 +26,7 @@ cat "$AUR_LIST" >> "$SCRIPT_DIR/packages.x86_64"
 # Backup 
 cp "$SCRIPT_DIR/pacman.conf" "$SCRIPT_DIR/pacman.conf.backup"
 # Replace [path-to-your-repo] with the actual path
-sed -i "s|file://\[path-to-your-repo\]|file://$REPO_DIR/$REPO_NAME|g" "$SCRIPT_DIR/pacman.conf"
+sed -i "s|file://\[path-to-your-repo\]|file://$REPO_DIR|g" "$SCRIPT_DIR/pacman.conf"
 
 
 # Exist workdir and/or out? remove them.
